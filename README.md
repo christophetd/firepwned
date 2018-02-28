@@ -2,7 +2,9 @@
 
 Firepwned is a tool that checks if your Firefox saved passwords have been involved in a known data leak using the [Have I Been Pwned API](https://haveibeenpwned.com/Passwords).
 
-![](./screenshot.png)
+<p align="center">
+  <img src="./screenshot.png" />
+</p>
 
 Features:
 - **Does not send any of your password or password hash to any third-party service, including Have I Been Pwned** (see [How It Works](#how-it-works) below).
