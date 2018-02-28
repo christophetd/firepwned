@@ -23,7 +23,7 @@ $ pip install -r requirements.txt
 $ python firepwned.py
 ```
 
-- To specify a path to a Firefox profile directory, use the `--profile` option (by default: `~/.mozilla/firefox/*.default`)
+- To specify a path to a Firefox profile directory, use the `--profile` option (by default: the first file found matching `~/.mozilla/firefox/*.default`)
 - To adjust the number of threads used to make requests to the Have I Been Pwned API, use the `--threads` option (by default: 10)
 
 ## Docker image
