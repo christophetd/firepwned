@@ -2,7 +2,7 @@ import unittest
 from firefox_saved_credentials import get_saved_credentials
 import os
 
-class TestPwnedPasswords(unittest.TestCase):
+class TestSavedCredentialsExtraction(unittest.TestCase):
     
     def test_extracts_saved_passwords_unencrypted(self):
         current_dir = os.path.dirname(os.path.realpath(__file__))
