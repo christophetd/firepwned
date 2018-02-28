@@ -34,6 +34,9 @@ def setup_logging(args):
     global LOG
     LOG = logging.getLogger(__name__)
 
+    # Prevent requests from displaying useless log messages
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+
 def read_master_password():
     master_password = getpass.getpass("Master password (just hit enter if you don't have any): ")
     if master_password == '':
