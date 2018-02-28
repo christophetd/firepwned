@@ -1,0 +1,13 @@
+language: python
+python:
+  - "3.5"
+sudo: required
+services:
+  - docker
+install:
+  - pip install -r requirements.txt
+script:
+  - python -m unittest discover test # Run unit tests
+  - docker build . # Make sure the Docker image builds correctly
+notifications:
+  email: false
