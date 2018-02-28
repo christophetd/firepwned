@@ -4,7 +4,6 @@
 # This file is largely based on firefox_decrypt (https://github.com/unode/firefox_decrypt),
 # available under the GPL-3.0 license.
 
-import argparse
 import ctypes as ct
 import json
 import logging
