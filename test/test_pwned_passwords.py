@@ -1,11 +1,9 @@
 from httmock import urlmatch, HTTMock
 import unittest
-import requests
 import hashlib
 from pwned_passwords import is_password_pwned, PREFIX_LEN
 
 class TestPwnedPasswords(unittest.TestCase):
-
 
     def test_detects_pwned_password(self):
 
