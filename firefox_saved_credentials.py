@@ -228,7 +228,7 @@ class NSSDecoder(object):
             if os.path.exists(os.path.join(loc, nssname)):
                 return loc
 
-        LOG.warn("%s not found on any of the default locations for this platform. "
+        LOG.warning("%s not found on any of the default locations for this platform. "
                  "Attempting to continue nonetheless.", nssname)
         return ""
 
@@ -368,7 +368,7 @@ class NSSInteraction(object):
                     raise Exit(Exit.BAD_MASTER_PASSWORD)
 
             else:
-                LOG.warn("Attempting decryption with no Master Password")
+                LOG.warning("Attempting decryption with no Master Password")
         finally:
             # Avoid leaking PK11KeySlot
             self.NSS._PK11_FreeSlot(keyslot)
