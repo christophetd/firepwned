@@ -43,7 +43,10 @@ $ docker run --rm -it \
 Any additional argument you add to the command will be passed to the script, e.g.
 
 ```
-$ docker run --rm -it -v ~/.mozilla/firefox/*.default:/profile christophetd/firepwned --threads 20
+$ docker run --rm -it \
+    --volume $(ls -d ~/.mozilla/firefox/*.default):/profile \
+    christophetd/firepwned \
+    --threads 20
 ```
 
 ## How it works
