@@ -31,7 +31,9 @@ $ python firepwned.py
 You can also use the `christophetd/firepwned` image. In this case, the directory of your Firefox profile needs to be mounted on `/profile` in the container.
 
 ```
-$ docker run --rm -it -v ~/.mozilla/firefox/*.default:/profile christophetd/firepwned
+$ docker run --rm -it \
+    -v $(ls -d ~/.mozilla/firefox/*.default):/profile \
+    christophetd/firepwned
 ```
 
 Any additional argument you add to the command will be passed to the script, e.g.
