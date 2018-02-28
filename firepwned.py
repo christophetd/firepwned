@@ -35,8 +35,7 @@ def setup_logging(args):
     LOG = logging.getLogger(__name__)
 
 def read_master_password():
-    print("Master password? (just hit enter if you don't have any")
-    master_password = getpass.getpass()
+    master_password = getpass.getpass("Master password (just hit enter if you don't have any): ")
     if master_password == '':
         return None
 
