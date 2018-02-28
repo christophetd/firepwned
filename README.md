@@ -1,5 +1,7 @@
 # firepwned
 
+[![Build Status](https://travis-ci.org/christophetd/firepwned.svg?branch=master)](https://travis-ci.org/christophetd/firepwned)
+
 Firepwned is a tool that checks if your Firefox saved passwords have been involved in a known data leak using the [Have I Been Pwned API](https://haveibeenpwned.com/Passwords).
 
 <p align="center">
