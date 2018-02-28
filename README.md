@@ -5,7 +5,7 @@ Firepwned is a tool that checks if your Firefox saved passwords have been involv
 ![](./screenshot.png)
 
 Features:
-- **Does not send any of your password or password hash to any third-party service, including HaveIBeenPwned** (see [How It Works](#how-it-works) below).
+- **Does not send any of your password or password hash to any third-party service, including Have I Been Pwned** (see [How It Works](#how-it-works) below).
 - Supports Firefox profiles encrypted with a master password.
 - Uses multiple threads for efficiency.
 
@@ -24,7 +24,7 @@ $ python firepwned.py
 ```
 
 - To specify a path to a Firefox profile directory, use the `--profile` option (by default: `~/.mozilla/firefox/*.default`)
-- To adjust the number of threads used to make requests to the HaveIBeenPwned API, use the `--threads` option (by default: 10)
+- To adjust the number of threads used to make requests to the Have I Been Pwned API, use the `--threads` option (by default: 10)
 
 ## Docker image
 
@@ -42,7 +42,7 @@ $ docker run --rm -it -v ~/.mozilla/firefox/*.default:/profile christophetd/fire
 
 ## How it works
 
-HaveIBeenPwned API supports checking if a password has been leaked without providing the password itself, or even a hash. The way it works is you provide the API with the first 5 characters of the SHA1 hash of the password to check. The API then returns the list of all leaked hashes starting with this prefix, and the script can check locally if one of the hashes matches the password. More information: https://www.troyhunt.com/ive-just-launched-pwned-passwords-version-2/
+The Have I Been Pwned API supports checking if a password has been leaked without providing the password itself, or even a hash. The way it works is you provide the API with the first 5 characters of the SHA1 hash of the password to check. The API then returns the list of all leaked hashes starting with this prefix, and the script can check locally if one of the hashes matches the password. More information: https://www.troyhunt.com/ive-just-launched-pwned-passwords-version-2/
 
 ## Compatibility
 
