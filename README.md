@@ -32,7 +32,7 @@ You can also use the `christophetd/firepwned` image. In this case, the directory
 
 ```
 $ docker run --rm -it \
-    -v $(ls -d ~/.mozilla/firefox/*.default):/profile \
+    --volume $(ls -d ~/.mozilla/firefox/*.default):/profile \
     christophetd/firepwned
 ```
 
