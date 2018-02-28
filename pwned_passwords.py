@@ -3,13 +3,14 @@ import hashlib
 
 PREFIX_LEN = 5
 LINE_DELIMITER = ":"
+API_URL = "https://api.pwnedpasswords.com/range/"
 
 def is_password_pwned(password):
     hash = hashlib.sha1(bytes(password, "utf8")).hexdigest()
     hash_prefix = hash[0:PREFIX_LEN]
     hash_suffix = hash[PREFIX_LEN:]
 
-    response = requests.get("https://api.pwnedpasswords.com/range/" + hash_prefix)
+    response = requests.get(API_URL + hash_prefix)
     if response.status_code != 200:
         raise Exception("PwnedPasswords API looks down")
 
