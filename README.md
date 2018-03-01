@@ -36,6 +36,8 @@ $ python firepwned.py
 
 ## Docker image
 
+[![](https://images.microbadger.com/badges/image/christophetd/firepwned.svg)](https://microbadger.com/images/christophetd/firepwned)
+
 You can also use the `christophetd/firepwned` image. It is based on Alpine and is very lightweight (~20 MB). 
 
 When running the container, you need to mount the directory of your Firefox profile to `/profile` in the container.
