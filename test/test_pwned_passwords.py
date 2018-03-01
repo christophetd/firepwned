@@ -25,7 +25,7 @@ class TestPwnedPasswords(unittest.TestCase):
             ])
 
         with HTTMock(mock):
-            self.assertTrue(is_password_pwned(password))
+            self.assertEqual(is_password_pwned(password), (True, 100))
 
     def test_detects_not_pwned_password(self):
 
@@ -45,7 +45,7 @@ class TestPwnedPasswords(unittest.TestCase):
             ])
 
         with HTTMock(mock):
-            self.assertFalse(is_password_pwned(password))
+            self.assertEqual(is_password_pwned(password), (False, 0))
 
     def test_api_error(self):
         @urlmatch(scheme='https', netloc=r'api.pwnedpasswords.com', path=r'/range/.*')

@@ -84,12 +84,12 @@ def main(args):
 
     def check_pwned_credentials(credentials):
         password = credentials['password']
-        if not password in checked_passwords:
+        if not (password in checked_passwords):
             checked_passwords[password] = pwned_passwords.is_password_pwned(password)
         else:
-            LOG.debug('Password "%s" already checked (pwned: %s), skipping' % (password, checked_passwords[password]))
+            LOG.debug('Password "%s" already checked (pwned: %s), skipping' % (password, checked_passwords[password][0]))
 
-        if checked_passwords[password] == True:
+        if checked_passwords[password][0] == True:
             pwned_credentials.append(credentials)
 
     for credentials in saved_credentials:
@@ -98,13 +98,14 @@ def main(args):
     executor.shutdown(wait=True)
 
     for credentials in pwned_credentials:
-        if pwned_passwords.is_password_pwned(credentials['password']):
-            table.add_row([
-                credentials['url'],
-                credentials['username'],
-                credentials['password'],
-                COLOR_RED + COLOR_BOLD + 'Pwned!' + COLOR_RESET
-            ])
+        password = credentials['password']
+        message = 'Pwned in %d breaches!' % checked_passwords[password][1]
+        table.add_row([
+            credentials['url'],
+            credentials['username'],
+            password,
+             COLOR_RED + COLOR_BOLD + message + COLOR_RESET
+        ])
 
     if len(pwned_credentials) == 0:
         LOG.info("Good news - it looks like none of your Firefox saved password is pwned!")
