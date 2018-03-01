@@ -80,9 +80,16 @@ def main(args):
 
     executor = ThreadPoolExecutor(max_workers=args.threads)
     pwned_credentials = []
+    checked_passwords = {} # password => boolean indicating if it's been pwned
 
     def check_pwned_credentials(credentials):
-        if pwned_passwords.is_password_pwned(credentials['password']):
+        password = credentials['password']
+        if not password in checked_passwords:
+            checked_passwords[password] = pwned_passwords.is_password_pwned(password)
+        else:
+            LOG.debug('Password "%s" already checked (pwned: %s), skipping' % (password, checked_passwords[password]))
+
+        if checked_passwords[password] == True:
             pwned_credentials.append(credentials)
 
     for credentials in saved_credentials:
