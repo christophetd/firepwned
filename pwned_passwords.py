@@ -13,7 +13,10 @@ def is_password_pwned(password):
     LOG = logging.getLogger('root')
 
     LOG.debug('Checking on HIBP API if password "%s" is pwned' % password)
-    response = requests.get(API_URL + hash_prefix)
+    headers = {
+        'User-Agent': 'https://github.com/christophetd/firepwned'
+    }
+    response = requests.get(API_URL + hash_prefix, headers=headers)
     if response.status_code != 200:
         raise Exception("PwnedPasswords API looks down")
 
