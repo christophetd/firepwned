@@ -21,6 +21,10 @@ $ cd firepwned
 $ pip install -r requirements.txt
 ```
 
+On Mac OS X, you'll need to install NSS: `brew install nss`/ `port install nss`.
+
+On Debian / Ubuntu you'll need the package `libnss3`, which should already have if you have Firefox installed.
+
 ## Usage
 
 ```
