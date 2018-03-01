@@ -10,6 +10,7 @@ import getpass
 from os.path import expanduser
 import os
 from concurrent.futures import ThreadPoolExecutor
+import platform
 
 COLOR_RED = '\033[91m'
 COLOR_RESET = '\033[0m'
@@ -48,15 +49,18 @@ def read_profile_path(args):
     if args.profile_path is not None:
         return args.profile_path
 
-    directory = expanduser("~/.mozilla/firefox")
+    if platform.system() == 'Darwin':
+        profile_path = "~/Library/Application Support/Firefox/Profiles" 
+    else:
+        profile_path = "~/.mozilla/firefox"
+
+    directory = expanduser(profile_path)
     profiles = [ subdir for subdir in os.listdir(directory) if subdir.endswith('.default') ]
 
     if len(profiles) > 1:
         LOG.warning("Detected multiple profiles in %s. Using the first one only (%s)" % (directory, profiles[0]))
 
     return directory + os.path.sep + profiles[0]
-
-
 def main(args):
     check_python_version()
     setup_logging(args)
