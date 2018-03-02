@@ -88,6 +88,7 @@ def display_results(saved_credentials, pwned_passwords):
     
     if len(pwned_passwords) == 0:
         LOG.info("Good news - it looks like none of your Firefox saved password is pwned!")
+        return
 
     table = prettytable.PrettyTable([
         COLOR_BOLD + 'Website' + COLOR_RESET,
