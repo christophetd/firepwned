@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from firefox_saved_credentials import get_saved_credentials, Exit
-import pwned_passwords
+from pwned_passwords import is_password_pwned
 import sys
 import logging
 import cli
@@ -38,7 +38,10 @@ def setup_logging(args):
     # Prevent requests from displaying useless log messages
     logging.getLogger("urllib3").setLevel(logging.WARNING)
 
-def read_master_password():
+def read_master_password(args):
+    if args.no_password:
+        return None
+
     master_password = getpass.getpass("Master password (just hit enter if you don't have any): ")
     if master_password == '':
         return None
@@ -61,11 +64,58 @@ def read_profile_path(args):
         LOG.warning("Detected multiple profiles in %s. Using the first one only (%s)" % (directory, profiles[0]))
 
     return directory + os.path.sep + profiles[0]
+
+# Returns a set of passwords
+def build_password_set(credentials):
+    return set([ credential['password'] for credential in credentials ])
+
+def get_pwned_passwords(passwords, num_threads):
+    executor = ThreadPoolExecutor(max_workers=num_threads)
+    pwned_passwords = {} # Map [Password => Number of times pwned]
+
+    def check_password(password):
+        pwned, count = is_password_pwned(password)
+        if pwned:
+            pwned_passwords[password] = count
+
+    for password in passwords:
+        executor.submit(check_password, password)
+
+    executor.shutdown(wait=True)
+    return pwned_passwords
+        
+def display_results(saved_credentials, pwned_passwords):
+    
+    if len(pwned_passwords) == 0:
+        LOG.info("Good news - it looks like none of your Firefox saved password is pwned!")
+
+    table = prettytable.PrettyTable([
+        COLOR_BOLD + 'Website' + COLOR_RESET,
+        COLOR_BOLD + 'Username' + COLOR_RESET,
+        COLOR_BOLD + 'Password' + COLOR_RESET,
+        COLOR_BOLD + 'Status' + COLOR_RESET
+    ], hrules=prettytable.ALL)
+
+    for credential in saved_credentials:
+        password = credential['password']
+        if password in pwned_passwords:
+            count = pwned_passwords[password]
+            message = 'Pwned in %d breaches!' % count
+            table.add_row([
+                credential['url'],
+                credential['username'],
+                password,
+                COLOR_RED + COLOR_BOLD + message + COLOR_RESET
+            ])
+    
+    print(table)
+
 def main(args):
     check_python_version()
     setup_logging(args)
-    master_password = read_master_password()
+    master_password = read_master_password(args)
     profile_path = read_profile_path(args)
+
     try:
         saved_credentials = get_saved_credentials(profile_path, master_password)
     except Exit as e:
@@ -75,46 +125,11 @@ def main(args):
     LOG.info("Successfully read %d saved credentials" % len(saved_credentials))
     LOG.info("Checking for pwned passwords using up to %d threads" % args.threads)
 
-    table = prettytable.PrettyTable([
-        COLOR_BOLD + 'Website' + COLOR_RESET,
-        COLOR_BOLD + 'Username' + COLOR_RESET,
-        COLOR_BOLD + 'Password' + COLOR_RESET,
-        COLOR_BOLD + 'Status' + COLOR_RESET
-    ], hrules=prettytable.ALL)
+    password_list = build_password_set(saved_credentials)
+    pwned_passwords = get_pwned_passwords(password_list, num_threads=args.threads)
+    display_results(saved_credentials, pwned_passwords)
 
-    executor = ThreadPoolExecutor(max_workers=args.threads)
-    pwned_credentials = []
-    checked_passwords = {} # password => boolean indicating if it's been pwned
-
-    def check_pwned_credentials(credentials):
-        password = credentials['password']
-        if not (password in checked_passwords):
-            checked_passwords[password] = pwned_passwords.is_password_pwned(password)
-        else:
-            LOG.debug('Password "%s" already checked (pwned: %s), skipping' % (password, checked_passwords[password][0]))
-
-        if checked_passwords[password][0] == True:
-            pwned_credentials.append(credentials)
-
-    for credentials in saved_credentials:
-        executor.submit(check_pwned_credentials, credentials)
-
-    executor.shutdown(wait=True)
-
-    for credentials in pwned_credentials:
-        password = credentials['password']
-        message = 'Pwned in %d breaches!' % checked_passwords[password][1]
-        table.add_row([
-            credentials['url'],
-            credentials['username'],
-            password,
-             COLOR_RED + COLOR_BOLD + message + COLOR_RESET
-        ])
-
-    if len(pwned_credentials) == 0:
-        LOG.info("Good news - it looks like none of your Firefox saved password is pwned!")
-    else:
-        print(table)
+    return pwned_passwords
 
 if __name__ == "__main__":
     main(cli.parser.parse_args())
