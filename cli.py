@@ -21,3 +21,10 @@ parser.add_argument(
     type = int,
     default = 10
 )
+
+parser.add_argument(
+    '--no-master-password', 
+    dest = 'no_password',
+    action = 'store_true',
+    help = 'Try to open the Firefox profile without any master password.'
+)
