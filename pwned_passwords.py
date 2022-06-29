@@ -1,10 +1,12 @@
-import requests
 import hashlib
 import logging
+
+import requests
 
 PREFIX_LEN = 5
 LINE_DELIMITER = ":"
 API_URL = "https://api.pwnedpasswords.com/range/"
+
 
 def is_password_pwned(password):
     hash = hashlib.sha1(bytes(password, "utf8")).hexdigest()

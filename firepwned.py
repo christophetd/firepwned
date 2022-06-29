@@ -1,25 +1,29 @@
 #!/usr/bin/env python
 
+import getpass
+import logging
+import os
+import platform
+import sys
+from concurrent.futures import ThreadPoolExecutor
+from os.path import expanduser
+
+import prettytable
+
+import cli
 from firefox_saved_credentials import get_saved_credentials, Exit
 from pwned_passwords import is_password_pwned
-import sys
-import logging
-import cli
-import prettytable
-import getpass
-from os.path import expanduser
-import os
-from concurrent.futures import ThreadPoolExecutor
-import platform
 
 COLOR_RED = '\033[91m'
 COLOR_RESET = '\033[0m'
 COLOR_BOLD = '\033[1m'
 
+
 def check_python_version():
     if sys.version_info[0] < 3:
         sys.stderr.write("Firepwned doesn't support Python 2. Please run it with Python 3, or use the Docker image.\n")
         sys.exit(1)
+
 
 def setup_logging(args):
     if args.loglevel == "debug":
@@ -38,6 +42,7 @@ def setup_logging(args):
     # Prevent requests from displaying useless log messages
     logging.getLogger("urllib3").setLevel(logging.WARNING)
 
+
 def read_master_password(args):
     if args.no_password:
         return None
@@ -48,30 +53,33 @@ def read_master_password(args):
 
     return master_password
 
+
 def read_profile_path(args):
     if args.profile_path is not None:
         return args.profile_path
 
     if platform.system() == 'Darwin':
-        profile_path = "~/Library/Application Support/Firefox/Profiles" 
+        profile_path = "~/Library/Application Support/Firefox/Profiles"
     else:
         profile_path = "~/.mozilla/firefox"
 
     directory = expanduser(profile_path)
-    profiles = [ subdir for subdir in os.listdir(directory) if subdir.endswith('.default') ]
+    profiles = [subdir for subdir in os.listdir(directory) if subdir.endswith('.default')]
 
     if len(profiles) > 1:
         LOG.warning("Detected multiple profiles in %s. Using the first one only (%s)" % (directory, profiles[0]))
 
     return directory + os.path.sep + profiles[0]
 
+
 # Returns a set of passwords
 def build_password_set(credentials):
-    return set([ credential['password'] for credential in credentials ])
+    return set([credential['password'] for credential in credentials])
+
 
 def get_pwned_passwords(passwords, num_threads):
     executor = ThreadPoolExecutor(max_workers=num_threads)
-    pwned_passwords = {} # Map [Password => Number of times pwned]
+    pwned_passwords = {}  # Map [Password => Number of times pwned]
 
     def check_password(password):
         pwned, count = is_password_pwned(password)
@@ -83,9 +91,9 @@ def get_pwned_passwords(passwords, num_threads):
 
     executor.shutdown(wait=True)
     return pwned_passwords
-        
+
+
 def display_results(saved_credentials, pwned_passwords):
-    
     if len(pwned_passwords) == 0:
         LOG.info("Good news - it looks like none of your Firefox saved password is pwned!")
         return
@@ -108,8 +116,9 @@ def display_results(saved_credentials, pwned_passwords):
                 password,
                 COLOR_RED + COLOR_BOLD + message + COLOR_RESET
             ])
-    
+
     print(table)
+
 
 def main(args):
     check_python_version()
@@ -132,6 +141,7 @@ def main(args):
     display_results(saved_credentials, pwned_passwords)
 
     return pwned_passwords
+
 
 if __name__ == "__main__":
     main(cli.parser.parse_args())

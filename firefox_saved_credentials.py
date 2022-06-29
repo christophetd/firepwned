@@ -15,7 +15,6 @@ import shutil
 import sqlite3
 import sys
 from base64 import b64decode
-
 from subprocess import run, PIPE
 from typing import Optional, Iterator
 
@@ -72,6 +71,7 @@ def get_version() -> str:
 
 __version_info__ = (1, 0, 0, "+git")
 __version__: str = get_version()
+
 
 class NotFoundError(Exception):
     """Exception to handle situations where a credentials file is not found
