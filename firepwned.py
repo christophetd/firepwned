@@ -104,7 +104,7 @@ def display_results(saved_credentials, pwned_passwords):
             message = 'Pwned in %d breaches!' % count
             table.add_row([
                 credential['url'],
-                credential['username'],
+                credential.get('username', '(none)'),
                 password,
                 COLOR_RED + COLOR_BOLD + message + COLOR_RESET
             ])
@@ -121,6 +121,7 @@ def main(args):
         saved_credentials = get_saved_credentials(profile_path, master_password)
     except Exit as e:
         LOG.error('Unable to retrieve Firefox saved credentials.')
+        LOG.error(e)
         sys.exit(1)
 
     LOG.info("Successfully read %d saved credentials" % len(saved_credentials))
