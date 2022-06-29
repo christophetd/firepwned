@@ -15,6 +15,7 @@ import shutil
 import sqlite3
 import sys
 from base64 import b64decode
+
 from subprocess import run, PIPE
 from typing import Optional, Iterator
 
@@ -35,26 +36,26 @@ except ImportError:
 try:
     # Python 3
     from configparser import ConfigParser
+
     raw_input = input
 except ImportError:
     # Python 2
     from ConfigParser import ConfigParser
 
-
 LOG: logging.Logger
 VERBOSE = False
 SYSTEM = platform.system()
-SYS64 = sys.maxsize > 2**32
+SYS64 = sys.maxsize > 2 ** 32
 DEFAULT_ENCODING = "utf-8"
 
 PWStore = list[dict[str, str]]
-
 
 
 def get_version() -> str:
     """Obtain version information from git if available otherwise use
     the internal version number
     """
+
     def internal_version():
         return '.'.join(map(str, __version_info__[:3])) + ''.join(__version_info__[3:])
 
@@ -71,7 +72,6 @@ def get_version() -> str:
 
 __version_info__ = (1, 0, 0, "+git")
 __version__: str = get_version()
-
 
 class NotFoundError(Exception):
     """Exception to handle situations where a credentials file is not found
@@ -120,6 +120,7 @@ class Exit(Exception):
 class Credentials:
     """Base credentials backend manager
     """
+
     def __init__(self, db):
         self.db = db
 
@@ -142,6 +143,7 @@ class Credentials:
 class SqliteCredentials(Credentials):
     """SQLite credentials backend manager
     """
+
     def __init__(self, profile):
         db = os.path.join(profile, "signons.sqlite")
 
@@ -170,6 +172,7 @@ class SqliteCredentials(Credentials):
 class JsonCredentials(Credentials):
     """JSON credentials backend manager
     """
+
     def __init__(self, profile):
         db = os.path.join(profile, "logins.json")
 
@@ -352,6 +355,7 @@ def load_libnss():
 
 class c_char_p_fromstr(ct.c_char_p):
     """ctypes char_p override that handles encoding str to bytes"""
+
     def from_param(self):
         return self.encode(DEFAULT_ENCODING)
 
@@ -406,6 +410,7 @@ class NSSProxy:
         if restype == ct.c_char_p:
             def _decode(result, func, *args):
                 return result.decode(DEFAULT_ENCODING)
+
             res.errcheck = _decode
 
         setattr(self, "_" + name, res)
@@ -434,7 +439,7 @@ class NSSProxy:
                 "Couldn't shutdown current NSS profile",
             )
 
-    def authenticate(self, profile, interactive):
+    def authenticate(self, profile, password):
         """Unlocks the profile if necessary, in which case a password
         will prompted to the user.
         """
@@ -450,8 +455,6 @@ class NSSProxy:
 
         try:
             if self._PK11_NeedLogin(keyslot):
-                password: str = ask_password(profile, interactive)
-
                 LOG.debug("Authenticating with password '%s'", password)
                 err_status: int = self._PK11_CheckUserPassword(keyslot, password)
 
@@ -513,6 +516,7 @@ class MozillaInteraction:
     """
     Abstraction interface to Mozilla profile and lib NSS
     """
+
     def __init__(self):
         self.profile = None
         self.proxy = NSSProxy()
@@ -523,11 +527,11 @@ class MozillaInteraction:
         self.profile = profile
         self.proxy.initialize(self.profile)
 
-    def authenticate(self, interactive):
+    def authenticate(self, password):
         """Authenticate the the current profile is protected by a master password,
         prompt the user and unlock the profile.
         """
-        self.proxy.authenticate(self.profile, interactive)
+        self.proxy.authenticate(self.profile, password)
 
     def unload_profile(self):
         """Shutdown NSS and deactivate current profile
@@ -597,6 +601,11 @@ def get_saved_credentials(profile_path, master_password):
     try:
         nss.authenticate(master_password)
         result = nss.decrypt_passwords()
+        for credentials in result:
+            if credentials.get('username') is None and credentials.get('user') is not None:
+                credentials['username'] = credentials['user']
+                del credentials['user']
+
         return result
     finally:
         nss.unload_profile()
