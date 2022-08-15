@@ -25,13 +25,15 @@ On Debian / Ubuntu you'll need the package `libnss3`, which you should already h
 
 On Mac OS X, you'll need to install NSS: `brew install nss`/ `port install nss`.
 
+On Windows, you'll need nothing more.
+
 ## Usage
 
 ```
 $ python firepwned.py
 ```
 
-- To specify a path to a Firefox profile directory, use the `--profile` option (by default: the first file found matching `~/.mozilla/firefox/*.default` on Ubuntu or `~/Library/Application\ Support/Firefox/Profiles/*.default` on Mac OS
+- To specify a path to a Firefox profile directory, use the `--profile` option (by default: the first file found matching `~/.mozilla/firefox/*.default` on Ubuntu, `~/Library/Application\ Support/Firefox/Profiles/*.default` on Mac OS or C:\Users\%username%\AppData\Roaming\Mozilla\Firefox\Profiles\*.default on Windows)
 - To adjust the number of threads used to make requests to the Have I Been Pwned API, use the `--threads` option (by default: 10)
 
 ## Docker image
